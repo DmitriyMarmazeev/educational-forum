@@ -1,0 +1,11 @@
+{
+  "name": "educational-forum-frontend",
+  "version": "1.0.0",
+  "description": "Frontend for Educational Forum",
+  "scripts": {
+    "start": "http-server src -p 3000"
+  },
+  "devDependencies": {
+    "http-server": "^14.1.1"
+  }
+}
