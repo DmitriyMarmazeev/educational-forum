@@ -1,0 +1,1 @@
+console.log('Educational Forum Frontend loaded');
