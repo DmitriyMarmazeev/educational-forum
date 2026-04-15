@@ -1,25 +1,24 @@
-def test_register_success(client, register_data):
-    response = client.post('/account/register', json=register_data)
+async def test_register_success(client, register_data):
+    response = await client.post('/auth/register', json=register_data)
 
-    assert response.status_code == 201
+    assert response.status_code == 201, 'Должен возвращаться код 201 (Created)'
+    assert 'application/json' in response.headers['content-type'], 'Ответ должен быть формата json'
 
     data = response.json()
     
-    assert 'id' in data, 'В ответе должен быть id пользователя'
-    assert data['email'] == register_data['email'], 'Почты не совадают'
-    assert data['login'] == register_data['login'], 'Логины не совпадают'
-    assert 'password' not in data, 'Пароль не должен возвращаться клиенту'
-    assert 'hashed_password' not in data, 'Пароль не должен возвращаться клиенту'
+    assert 'access_token' in data, 'В ответе должен быть access_token'
+    assert 'token_type' in data, 'В ответе должен быть указан тип токена token_type'
 
-
-def test_register_validation_weak_password(client, register_data):
-    response = client.post('/account/register', json={
+async def test_register_validation_weak_password(client, register_data):
+    response = await client.post('/auth/register', json={
         'email': register_data['email'],
-        'login': register_data['login'],
+        'name': register_data['name'],
+        'surname': register_data['surname'],
         'password': 'weak'
     })
 
     # Ошибка 422 - Unprocessable entity - должен быть по умолчанию
     # при ошибке валидации в FastAPI Pydantic,
     # исправить тест, если это не так
-    assert response.status_code == 422
+    assert response.status_code != 201, 'Нельзя создавать аккаунт с паролем меньше 6 символов'
+    assert response.status_code == 422, 'Должен возвращаться код 422 (Unprocessable Content)'
