@@ -5,7 +5,7 @@ Cypress.Commands.add('getByData', (selector) => {
 });
 
 Cypress.Commands.add('registerUser', (userData) => {
-  cy.visit('/');
+  cy.visit('/register');
 
   const {
     email = 'test1@example.ru',
