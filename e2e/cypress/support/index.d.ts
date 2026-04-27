@@ -14,8 +14,6 @@ interface UserRegisterData {
     surname?: string,
     password?: string,
     passwordConfirm?: string,
-    shouldFail?: boolean,
-    shouldSuccessBeStubbed?: boolean,
 }
 
 export interface ReturnedUserByEmail {

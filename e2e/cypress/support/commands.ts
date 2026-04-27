@@ -13,38 +13,15 @@ Cypress.Commands.add('registerUser', (userData) => {
     surname = 'test1-surname',
     password = 'test1-password',
     passwordConfirm = 'test1-password',
-    shouldFail = false,
-    shouldSuccessBeStubbed = false,
   } = userData;
 
-  if (email !== undefined) cy.getByData('email-input').type(email);
-  if (name !== undefined) cy.getByData('name-input').type(name);
-  if (surname !== undefined) cy.getByData('surname-input').type(surname);
-  if (password !== undefined) cy.getByData('password-input').type(password);
-  if (passwordConfirm !== undefined) cy.getByData('password-confirm-input').type(passwordConfirm);
-
-  if (shouldSuccessBeStubbed) {
-    if (shouldFail) {
-      cy.intercept('POST', '/auth/register', {
-        statusCode: 400,
-        body: {
-          detail: 'Validation error'
-        }
-      }).as('register');
-    } else {
-      cy.intercept('POST', 'auth/register', {
-        statusCode: 201,
-        body: {
-          "access_token": "access_token_stub",
-          "token_type": "access"
-        }
-      }).as('register');
-    }
-  }
+  if (email !==  null) cy.getByData('email-input').type(email);
+  if (name !==  null) cy.getByData('name-input').type(name);
+  if (surname !==  null) cy.getByData('surname-input').type(surname);
+  if (password !==  null) cy.getByData('password-input').type(password);
+  if (passwordConfirm !==  null) cy.getByData('password-confirm-input').type(passwordConfirm);
 
   cy.getByData('submit').click();
-  
-   if (shouldSuccessBeStubbed) cy.wait('@register');
 });
 
 Cypress.Commands.add('errorShouldBeVisible', (errorSelector, errorText) => {

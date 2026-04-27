@@ -9,37 +9,37 @@ describe('register page', () => {
     });
 
     it('should show email validation error', () => {
-      cy.registerUser({ email: 'incorrect_email', shouldFail: true });
+      cy.registerUser({ email: 'incorrect_email' });
       cy.errorShouldBeVisible('email-error', 'Некорректный email');
     });
 
     it('should show empty email validation error', () => {
-      cy.registerUser({ email: undefined, shouldFail: true });
+      cy.registerUser({ email: null });
       cy.errorShouldBeVisible('email-error', 'Заполните email');
     });
 
     it('should show empty name validation error', () => {
-      cy.registerUser({ name: undefined, shouldFail: true });
+      cy.registerUser({ name: null });
       cy.errorShouldBeVisible('name-error', 'Заполните имя');
     });
 
     it('should show empty surname validation error', () => {
-      cy.registerUser({ surname: undefined, shouldFail: true });
+      cy.registerUser({ surname: null });
       cy.errorShouldBeVisible('surname-error', 'Заполните фамилию');
     });
 
     it('should show empty password validation error', () => {
-      cy.registerUser({ password: undefined, shouldFail: true });
+      cy.registerUser({ password: null });
       cy.errorShouldBeVisible('password-error', 'Заполните пароль');
     });
 
     it('should show empty confirm password validation error', () => {
-      cy.registerUser({ passwordConfirm: undefined, shouldFail: true });
+      cy.registerUser({ passwordConfirm: null });
       cy.errorShouldBeVisible('password-confirm-error', 'Повторите пароль');
     });
 
     it('shows error when password and its confirmation do not match', () => {
-      cy.registerUser({ passwordConfirm: 'AnotherPassword', shouldFail: true });
+      cy.registerUser({ passwordConfirm: 'AnotherPassword' });
       cy.errorShouldBeVisible('password-confirm-error', 'Пароли не совпадают');
     });
   });
