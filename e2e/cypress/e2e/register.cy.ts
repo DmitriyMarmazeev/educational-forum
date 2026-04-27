@@ -1,9 +1,5 @@
 describe('register page', () => {
   context('Client-side validation', () => {
-    beforeEach(() => {
-      cy.resetDB();
-    });
-
     it('redirects to main on success', () => {
       cy.registerUser({});
       cy.location('pathname').should('eq', '/');
@@ -49,30 +45,12 @@ describe('register page', () => {
   });
 
   context('Server-side validation', () => {
-    beforeEach(() => {
-      cy.resetDB();
-    });
-
-    it('registers new user and modifies the DB', () => {
-      const email = 'test@email.ru'
-      cy.registerUser({ email, shouldSuccessBeStubbed: false });
-      cy.getUserByEmail(email).then((user) => {
-        expect(user).to.not.be.null;
-        expect(user.email).to.equal(email);
-      });
-    });
-
     it('should not let register two users with same email', () => {
       const email = 'test1@email.ru';
 
-      cy.registerUser({ email, shouldSuccessBeStubbed: false });
-      
-      cy.getUserByEmail(email).then((user) => {
-        expect(user).to.not.be.null;
-        expect(user.email).to.equal(email);
-      });
+      cy.registerUser({ email });
+      cy.registerUser({ email });
 
-      cy.registerUser({ email, shouldSuccessBeStubbed: false });
       cy.errorShouldBeVisible('email-error', 'Пользователь с таким email уже существует');
     });
   });

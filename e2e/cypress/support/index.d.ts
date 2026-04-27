@@ -4,10 +4,6 @@ declare global {
             getByData(dataTestAttribure: string): Chainable<JQuery<HTMLElement>>,
             registerUser(userData: UserRegisterData): Chainable<void>,
             errorShouldBeVisible(errorSelector: string, errorText: string): Chainable<void>,
-            resetDB(): Chainable<void>,
-            seedDB(): Chainable<void>,
-            execDBUtils(args: string[]): Chainable<Exec>,
-            getUserByEmail(email: string): Chainable<ReturnedUserByEmail>,
         }
     }
 }

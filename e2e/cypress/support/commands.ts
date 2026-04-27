@@ -50,23 +50,3 @@ Cypress.Commands.add('registerUser', (userData) => {
 Cypress.Commands.add('errorShouldBeVisible', (errorSelector, errorText) => {
   cy.getByData(errorSelector).should('be.visible').should('contain', errorText);
 });
-
-Cypress.Commands.add('execDBUtils', (args) => {
-  return cy.exec(`cd ../backend && python3 -m tests.db_utils_for_cypress ${args.join(' ')}`);
-});
-
-Cypress.Commands.add('resetDB', () => {
-  cy.execDBUtils(['reset']);
-});
-
-Cypress.Commands.add('seedDB', () => {
-  cy.execDBUtils(['seed']);
-});
-
-Cypress.Commands.add('getUserByEmail', (email) => {
-  cy.execDBUtils(['getUserByEmail', email])
-    .then((result) => {
-      const user: ReturnedUserByEmail = JSON.parse(result.stdout);
-      return user;
-  });
-});
