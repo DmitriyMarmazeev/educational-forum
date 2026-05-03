@@ -48,3 +48,13 @@ async def test_login_valid(client, register_data):
     
     assert 'access_token' in data, 'В ответе должен быть access_token'
     assert 'token_type' in data, 'В ответе должен быть указан тип токена token_type'
+
+
+async def test_login_invalid(client, register_data):
+    response_register = await client.post('/auth/register', json=register_data)
+    response_login = await client.post('/auth/login', json={
+        'email': register_data['email'],
+        'password': 'invalid_password'
+    })
+
+    assert response_login.status_code == 401
