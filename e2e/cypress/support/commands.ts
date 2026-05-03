@@ -1,5 +1,3 @@
-import { ReturnedUserByEmail } from "./index";
-
 Cypress.Commands.add('getByData', (selector) => {
   return cy.get(`[data-test=${selector}]`);
 });
@@ -47,26 +45,34 @@ Cypress.Commands.add('registerUser', (userData) => {
    if (shouldSuccessBeStubbed) cy.wait('@register');
 });
 
+Cypress.Commands.add('loginUser', (userData) => {
+  cy.visit('/login');
+
+  const {
+    email = 'test1@example.ru',
+    password = 'test1-password',
+  } = userData;
+
+  if (email !== null) cy.getByData('email-input').type(email);
+  if (password !== null) cy.getByData('password-input').type(password);
+
+  cy.getByData('submit').click();
+});
+
 Cypress.Commands.add('errorShouldBeVisible', (errorSelector, errorText) => {
   cy.getByData(errorSelector).should('be.visible').should('contain', errorText);
 });
 
-Cypress.Commands.add('execDBUtils', (args) => {
-  return cy.exec(`cd ../backend && python3 -m tests.db_utils_for_cypress ${args.join(' ')}`);
-});
+Cypress.Commands.add('editField', (field, value) => {
+  cy.getByData(`${field}-edit`).click();
 
-Cypress.Commands.add('resetDB', () => {
-  cy.execDBUtils(['reset']);
-});
+  cy.getByData(`${field}-input`).then(($input) => {
+    const currentValue = $input.val();
 
-Cypress.Commands.add('seedDB', () => {
-  cy.execDBUtils(['seed']);
-});
+    cy.wrap($input).clear();
 
-Cypress.Commands.add('getUserByEmail', (email) => {
-  cy.execDBUtils(['getUserByEmail', email])
-    .then((result) => {
-      const user: ReturnedUserByEmail = JSON.parse(result.stdout);
-      return user;
+    if (value !== '' && value !== currentValue) {
+      cy.wrap($input).type(value);
+    }
   });
 });
