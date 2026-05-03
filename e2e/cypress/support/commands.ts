@@ -1,5 +1,3 @@
-import { ReturnedUserByEmail } from "./index";
-
 Cypress.Commands.add('getByData', (selector) => {
   return cy.get(`[data-test=${selector}]`);
 });
@@ -24,6 +22,34 @@ Cypress.Commands.add('registerUser', (userData) => {
   cy.getByData('submit').click();
 });
 
+Cypress.Commands.add('loginUser', (userData) => {
+  cy.visit('/login');
+
+  const {
+    email = 'test1@example.ru',
+    password = 'test1-password',
+  } = userData;
+
+  if (email !== null) cy.getByData('email-input').type(email);
+  if (password !== null) cy.getByData('password-input').type(password);
+
+  cy.getByData('submit').click();
+});
+
 Cypress.Commands.add('errorShouldBeVisible', (errorSelector, errorText) => {
   cy.getByData(errorSelector).should('be.visible').should('contain', errorText);
+});
+
+Cypress.Commands.add('editField', (field, value) => {
+  cy.getByData(`${field}-edit`).click();
+
+  cy.getByData(`${field}-input`).then(($input) => {
+    const currentValue = $input.val();
+
+    cy.wrap($input).clear();
+
+    if (value !== '' && value !== currentValue) {
+      cy.wrap($input).type(value);
+    }
+  });
 });
