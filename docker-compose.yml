@@ -8,23 +8,33 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-forum_pass}
       POSTGRES_DB: ${POSTGRES_DB:-forum_db}
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-forum_user} -d ${POSTGRES_DB:-forum_db}"]
+      test:
+        [
+          'CMD-SHELL',
+          'pg_isready -U ${POSTGRES_USER:-forum_user} -d ${POSTGRES_DB:-forum_db}',
+        ]
       interval: 10s
       timeout: 5s
       retries: 5
     ports:
-      - "5432:5432"
+      - '5432:5432'
     networks:
       - app-network
     volumes:
       - ./postgres_data:/var/lib/postgresql/data
 
   backend:
-    build: 
+    build:
       context: ./backend
       dockerfile: Dockerfile
     healthcheck:
-      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/', timeout=2)"]
+      test:
+        [
+          'CMD',
+          'python',
+          '-c',
+          "import urllib.request; urllib.request.urlopen('http://localhost:8000/', timeout=2)",
+        ]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -37,11 +47,22 @@ services:
       db:
         condition: service_healthy
     ports:
-      - "8000:8000"
+      - '8000:8000'
     volumes:
       - ./backend:/app
       - ./backend/migration:/app/alembic
       - ./backend/alembic.ini:/app/alembic.ini
+    networks:
+      - app-network
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - '5173:80'
+    depends_on:
+      - backend
     networks:
       - app-network
 
@@ -50,34 +71,13 @@ services:
     container_name: forum_adminer
     restart: unless-stopped
     ports:
-      - "8080:8080"
+      - '8080:8080'
     environment:
       ADMINER_DEFAULT_SERVER: db
     depends_on:
       - db
     networks:
       - app-network
-
-
-  # frontend:
-  #   build: 
-  #     context: ./frontend
-  #     dockerfile: Dockerfile
-  #   healthcheck:
-  #     test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://127.0.0.1:3000"]
-  #     interval: 10s
-  #     timeout: 5s
-  #     retries: 3
-  #     start_period: 10s
-  #   depends_on:
-  #     backend:
-  #       condition: service_healthy
-  #   ports:
-  #     - "3000:3000"
-  #   volumes:
-  #     - ./frontend:/app
-  #   networks:
-  #     - app-network
 
 networks:
   app-network:
