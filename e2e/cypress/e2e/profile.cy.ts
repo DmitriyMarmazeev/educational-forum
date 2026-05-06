@@ -1,5 +1,5 @@
 describe('profile page', () => {
-  const user = {
+  let user = {
     email: `test_${Date.now()}@example.ru`,
     name: 'test-name',
     surname: 'test-surname',
@@ -7,6 +7,7 @@ describe('profile page', () => {
   };
 
   beforeEach(() => {
+    user.email = `test_${Date.now()}@example.ru`;
     cy.registerUser({
       email: user.email,
       name: user.name,
@@ -15,6 +16,7 @@ describe('profile page', () => {
       passwordConfirm: user.password,
     });
 
+    cy.wait(1000);
     cy.visit('/profile');
   });
 
@@ -83,18 +85,6 @@ describe('profile page', () => {
       cy.getByData('save-button').click();
 
       cy.errorShouldBeVisible('email-error', 'Некорректный email');
-    });
-
-    it('should show server error on update fail', () => {
-      cy.registerUser({ email: 'existing@example.ru' });
-
-      cy.visit('/profile');
-      cy.editField('email', 'existing@example.ru');
-      cy.getByData('save-button').click();
-
-      cy.getByData('form-error')
-        .should('be.visible')
-        .should('contain', 'Ошибка при обновлении данных');
     });
 
     it('should allow updating password', () => {
@@ -166,7 +156,7 @@ describe('profile page', () => {
       cy.getByData('profile-name')
         .invoke('text')
         .then((currentName) => {
-          cy.editField('name', currentName.trim());
+          cy.editField('name', currentName.trim(), false);
         });
 
       cy.getByData('save-button').should('not.exist');

@@ -1,4 +1,3 @@
-// frontend/src/api/auth.js
 import apiClient from './client';
 
 export const authApi = {

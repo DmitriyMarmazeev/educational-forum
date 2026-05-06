@@ -2,10 +2,10 @@
 	<div class="space-y-6 animate-fade-in">
 		<div class="glass-card p-6">
 			<h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-				Comment Moderation
+				Модерация комментариев
 			</h1>
 			<p class="text-gray-600 dark:text-gray-400">
-				Review and manage user comments
+				Проверяйте и управляйте комментариями пользователей
 			</p>
 		</div>
 
@@ -20,7 +20,7 @@
 			<div
 				v-else-if="comments.length === 0"
 				class="text-center py-8 text-gray-500">
-				No comments to moderate
+        Нет комментариев для модерации
 			</div>
 
 			<div
@@ -37,7 +37,7 @@
 									comment.user_email || `User #${comment.user_id}`
 								}}</span>
 								<span class="text-xs text-gray-500"
-									>Task ID: {{ comment.task_id }}</span
+									>ID Задания: {{ comment.task_id }}</span
 								>
 							</div>
 							<p class="text-gray-700 dark:text-gray-300">
@@ -50,7 +50,7 @@
 						<button
 							@click="deleteComment(comment)"
 							class="btn-outline px-3 py-1 text-sm text-red-500">
-							Delete
+							Удалить
 						</button>
 					</div>
 				</div>
@@ -77,21 +77,21 @@
 			const response = await moderatorApi.getCommentsForModeration();
 			comments.value = response.data;
 		} catch (error) {
-			console.error('Failed to load comments', error);
+			console.error('Не удалось загрузить комментарии', error);
 		} finally {
 			loading.value = false;
 		}
 	};
 
 	const deleteComment = async (comment) => {
-		if (confirm('Are you sure you want to delete this comment?')) {
+		if (confirm('Вы уверены, что хотите удалить этот комментарий?')) {
 			try {
 				await moderatorApi.deleteCommentByModerator(comment.id_task_comment);
 				comments.value = comments.value.filter(
 					(c) => c.id_task_comment !== comment.id_task_comment,
 				);
 			} catch (error) {
-				console.error('Failed to delete comment', error);
+				console.error('Не удалось удалить комментарий', error);
 			}
 		}
 	};

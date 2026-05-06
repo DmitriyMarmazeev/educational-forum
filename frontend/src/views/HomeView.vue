@@ -1,12 +1,12 @@
 <template>
-	<div class="space-y-8 animate-fade-in">
+	<div class="space-y-8 animate-fade-in pt-6">
 		<div class="text-center space-y-4">
 			<h1
 				class="text-5xl font-bold bg-gradient-to-r from-primary-500 to-secondary-500 bg-clip-text text-transparent">
-				Educational Tasks
+				Образовательный форум
 			</h1>
 			<p class="text-xl text-gray-600 dark:text-gray-400">
-				Browse and solve interesting problems from our community
+				Создавайте, обсуждайте и делитесь заданиями по различным предметам
 			</p>
 		</div>
 
@@ -15,38 +15,38 @@
 				<div class="flex-1 min-w-[200px]">
 					<label
 						class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
-						>Subject</label
+						>Предмет</label
 					>
 					<select
 						v-model="filters.subject_id"
 						@change="applyFilters"
 						class="input-field">
-						<option :value="null">All Subjects</option>
-						<option value="1">Mathematics</option>
-						<option value="2">Physics</option>
-						<option value="3">Chemistry</option>
-						<option value="4">Biology</option>
-						<option value="5">Computer Science</option>
+						<option :value="null">Все предметы</option>
+						<option value="1">Математика</option>
+						<option value="2">Русский язык</option>
+						<option value="3">Физика</option>
+						<option value="4">Информатика</option>
+						<option value="5">История</option>
 					</select>
 				</div>
 
 				<div class="flex-1 min-w-[150px]">
 					<label
 						class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
-						>Task #</label
+						>№ задания</label
 					>
 					<input
 						type="number"
 						v-model.number="filters.task_number"
 						@input="applyFilters"
-						placeholder="Number"
+						placeholder="№ задания"
 						class="input-field" />
 				</div>
 
 				<button
 					@click="resetFilters"
 					class="btn-outline px-4 py-3">
-					Reset
+					Сбросить
 				</button>
 			</div>
 		</div>
@@ -61,7 +61,7 @@
 		<div
 			v-else-if="tasksStore.tasks.length === 0"
 			class="glass-card p-12 text-center">
-			<p class="text-gray-500 dark:text-gray-400">No tasks found</p>
+			<p class="text-gray-500 dark:text-gray-400">Задания не найдены</p>
 		</div>
 
 		<div
@@ -78,12 +78,12 @@
 				@click="prevPage"
 				:disabled="skip === 0"
 				class="btn-outline px-6 py-2 disabled:opacity-50 disabled:cursor-not-allowed">
-				Previous
+				Предыдущая
 			</button>
 			<button
 				@click="nextPage"
 				class="btn-outline px-6 py-2">
-				Next
+				Следующая
 			</button>
 		</div>
 	</div>

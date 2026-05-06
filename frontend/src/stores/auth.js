@@ -1,4 +1,3 @@
-// frontend/src/stores/auth.js (добавлен wallet и обновлены методы)
 import { defineStore } from 'pinia';
 import { authApi } from '../api';
 
@@ -14,7 +13,6 @@ export const useAuthStore = defineStore('auth', {
 		isAuthor: (state) => state.user?.role_name === 'author',
 		isModerator: (state) => state.user?.role_name === 'moderator',
 		isAdmin: (state) => state.user?.role_name === 'admin',
-		// Добавляем геттер для обычного пользователя
 		isRegularUser: (state) => state.user?.role_name === 'student',
 		userName: (state) =>
 			state.user ? `${state.user.name} ${state.user.surname}` : '',
@@ -40,7 +38,7 @@ export const useAuthStore = defineStore('auth', {
 			} catch (error) {
 				return {
 					success: false,
-					error: error.response?.data?.detail || 'Registration failed',
+					error: error.response?.data?.detail || 'Ошибка регистрации',
 				};
 			} finally {
 				this.loading = false;
@@ -58,7 +56,7 @@ export const useAuthStore = defineStore('auth', {
 			} catch (error) {
 				return {
 					success: false,
-					error: error.response?.data?.detail || 'Login failed',
+					error: error.response?.data?.detail || 'Ошибка входа',
 				};
 			} finally {
 				this.loading = false;
@@ -83,7 +81,7 @@ export const useAuthStore = defineStore('auth', {
 			} catch (error) {
 				return {
 					success: false,
-					error: error.response?.data?.detail || 'Update failed',
+					error: error.response?.data?.detail || 'Ошибка обновления данных',
 				};
 			}
 		},
@@ -96,7 +94,7 @@ export const useAuthStore = defineStore('auth', {
 			} catch (error) {
 				return {
 					success: false,
-					error: error.response?.data?.detail || 'Delete failed',
+					error: error.response?.data?.detail || 'Не удалось удалить аккаунт',
 				};
 			}
 		},
@@ -109,7 +107,7 @@ export const useAuthStore = defineStore('auth', {
 			} catch (error) {
 				return {
 					success: false,
-					error: error.response?.data?.detail || 'Application failed',
+					error: error.response?.data?.detail || 'Не удалось подать заявку',
 				};
 			}
 		},
@@ -122,7 +120,7 @@ export const useAuthStore = defineStore('auth', {
 			} catch (error) {
 				return {
 					success: false,
-					error: error.response?.data?.detail || 'Subscription failed',
+					error: error.response?.data?.detail || 'Не удалось оформить подписку',
 				};
 			}
 		},

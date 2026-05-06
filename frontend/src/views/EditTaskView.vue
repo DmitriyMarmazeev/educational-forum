@@ -1,7 +1,5 @@
-<!-- frontend/src/views/EditTaskView.vue -->
 <template>
 	<div class="max-w-4xl mx-auto animate-fade-in">
-		<!-- Состояние загрузки -->
 		<div
 			v-if="loading"
 			class="flex justify-center py-12">
@@ -9,7 +7,6 @@
 				class="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-500"></div>
 		</div>
 
-		<!-- Ошибка -->
 		<div
 			v-else-if="error"
 			class="glass-card p-8 text-center">
@@ -17,18 +14,17 @@
 			<router-link
 				to="/"
 				class="btn-primary mt-4 inline-block"
-				>Back to Tasks</router-link
+				>Вернуться к заданиям</router-link
 			>
 		</div>
 
-		<!-- Форма редактирования -->
 		<div
 			v-else-if="task"
 			class="glass-card p-8">
 			<h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-				Edit Task
+        Редактировать задание
 			</h1>
-			<p class="text-gray-600 dark:text-gray-400 mb-8">Update your problem</p>
+			<p class="text-gray-600 dark:text-gray-400 mb-8">Обновить задание</p>
 
 			<form
 				@submit.prevent="handleSubmit"
@@ -36,24 +32,24 @@
 				<div>
 					<label
 						class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
-						>Subject</label
+						>Предмет</label
 					>
 					<select
 						v-model="form.id_subject"
 						class="input-field">
-						<option :value="null">Select subject</option>
-						<option :value="1">Mathematics</option>
-						<option :value="2">Physics</option>
-						<option :value="3">Chemistry</option>
-						<option :value="4">Biology</option>
-						<option :value="5">Computer Science</option>
+						<option :value="null">Выберите предмет</option>
+						<option :value="1">Математика</option>
+						<option :value="2">Русский язык</option>
+						<option :value="3">Физика</option>
+						<option :value="4">Информатика</option>
+						<option :value="5">История</option>
 					</select>
 				</div>
 
 				<div>
 					<label
 						class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
-						>Task Number</label
+						>Номер задания</label
 					>
 					<input
 						type="number"
@@ -64,7 +60,7 @@
 				<div>
 					<label
 						class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
-						>Condition</label
+						>Условие</label
 					>
 					<textarea
 						v-model="form.condition"
@@ -75,7 +71,7 @@
 				<div>
 					<label
 						class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
-						>Answer</label
+						>Ответ</label
 					>
 					<input
 						type="text"
@@ -86,7 +82,7 @@
 				<div>
 					<label
 						class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
-						>Solution</label
+						>Решение</label
 					>
 					<textarea
 						v-model="form.solution"
@@ -97,7 +93,7 @@
 				<div>
 					<label
 						class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
-						>Image URL</label
+						>Ссылка на картинку</label
 					>
 					<input
 						type="text"
@@ -122,37 +118,35 @@
 					<router-link
 						:to="`/tasks/${taskId}`"
 						class="btn-outline"
-						>Cancel</router-link
+						>Отменить</router-link
 					>
 					<button
 						v-if="canDelete"
 						type="button"
 						@click="showDeleteModal = true"
 						class="btn-outline text-red-500 border-red-500 hover:bg-red-50">
-						Delete Task
+						Удалить задание
 					</button>
 				</div>
 			</form>
 		</div>
 
-		<!-- Модальное окно подтверждения удаления -->
 		<div
 			v-if="showDeleteModal"
 			class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 animate-fade-in"
 			@click.self="showDeleteModal = false">
 			<div class="glass-card p-6 max-w-md w-full mx-4">
 				<h3 class="text-xl font-bold mb-4 text-gray-900 dark:text-white">
-					Delete Task
+					Удалить задание
 				</h3>
 				<p class="text-gray-600 dark:text-gray-400 mb-6">
-					Are you sure you want to delete this task? This action cannot be
-					undone.
+					Вы уверены, что хотите удалить это задание? Это действие нельзя отменить.
 				</p>
 				<div class="flex gap-4 justify-end">
 					<button
 						@click="showDeleteModal = false"
 						class="btn-outline px-4 py-2">
-						Cancel
+						Отменить
 					</button>
 					<button
 						@click="confirmDelete"
@@ -179,7 +173,6 @@
 
 	const taskId = route.params.id;
 
-	// Состояния
 	const loading = ref(true);
 	const error = ref('');
 	const task = ref(null);
@@ -196,7 +189,6 @@
 	const showDeleteModal = ref(false);
 	const deleteLoading = ref(false);
 
-	// Вычисляемые свойства
 	const canDelete = computed(() => {
 		if (!task.value || !authStore.user) return false;
 		return (
@@ -212,7 +204,6 @@
 			const result = await tasksStore.fetchTask(taskId);
 			if (result.success && result.data) {
 				task.value = result.data;
-				// Заполняем форму данными задачи
 				form.value = {
 					condition: result.data.condition || '',
 					image: result.data.image || '',
@@ -222,14 +213,13 @@
 					solution: '',
 				};
 			} else {
-				error.value = result.error || 'Task not found';
-				// Перенаправляем на главную через 2 секунды
+				error.value = result.error || 'Задание не найдено';
 				setTimeout(() => {
 					router.push('/');
 				}, 2000);
 			}
 		} catch (err) {
-			error.value = 'Failed to load task';
+			error.value = 'Не удалось загрузить задание';
 			console.error(err);
 			setTimeout(() => {
 				router.push('/');
@@ -266,7 +256,7 @@
 		if (result.success) {
 			router.push(`/tasks/${taskId}`);
 		} else {
-			submitError.value = result.error || 'Failed to update task';
+			submitError.value = result.error || 'Не удалось обновить задание';
 		}
 
 		submitting.value = false;
@@ -278,7 +268,7 @@
 		if (result.success) {
 			router.push('/');
 		} else {
-			submitError.value = result.error || 'Failed to delete task';
+			submitError.value = result.error || 'Не удалось удалить задание';
 			showDeleteModal.value = false;
 		}
 		deleteLoading.value = false;

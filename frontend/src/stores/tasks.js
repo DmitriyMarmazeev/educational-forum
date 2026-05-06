@@ -1,4 +1,3 @@
-// frontend/src/stores/tasks.js
 import { defineStore } from 'pinia';
 import { tasksApi } from '../api';
 

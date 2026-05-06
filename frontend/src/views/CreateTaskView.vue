@@ -2,10 +2,10 @@
 	<div class="max-w-4xl mx-auto animate-fade-in">
 		<div class="glass-card p-8">
 			<h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-				Create New Task
+				Создать новое задание
 			</h1>
 			<p class="text-gray-600 dark:text-gray-400 mb-8">
-				Share a new problem with the community
+				Делитесь новыми заданиями с сообществом
 			</p>
 
 			<form
@@ -14,25 +14,25 @@
 				<div>
 					<label
 						class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
-						>Subject *</label
+						>Предмет *</label
 					>
 					<select
 						v-model="form.id_subject"
 						class="input-field"
 						required>
-						<option value="">Select subject</option>
-						<option :value="1">Mathematics</option>
-						<option :value="2">Physics</option>
-						<option :value="3">Chemistry</option>
-						<option :value="4">Biology</option>
-						<option :value="5">Computer Science</option>
+						<option value="">Выберите предмет</option>
+						<option :value="1">Математика</option>
+						<option :value="2">Русский язык</option>
+						<option :value="3">Физика</option>
+						<option :value="4">Информатика</option>
+						<option :value="5">История</option>
 					</select>
 				</div>
 
 				<div>
 					<label
 						class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
-						>Task Number *</label
+						>Номер задания *</label
 					>
 					<input
 						type="number"
@@ -45,7 +45,7 @@
 				<div>
 					<label
 						class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
-						>Condition *</label
+						>Условие *</label
 					>
 					<textarea
 						v-model="form.condition"
@@ -58,7 +58,7 @@
 				<div>
 					<label
 						class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
-						>Answer *</label
+						>Ответ *</label
 					>
 					<input
 						type="text"
@@ -71,7 +71,7 @@
 				<div>
 					<label
 						class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
-						>Solution *</label
+						>Решение *</label
 					>
 					<textarea
 						v-model="form.solution"
@@ -84,7 +84,7 @@
 				<div>
 					<label
 						class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
-						>Image URL (optional)</label
+						>Ссылка на картинку (необязательно)</label
 					>
 					<input
 						type="text"
@@ -104,12 +104,12 @@
 						type="submit"
 						:disabled="loading"
 						class="btn-primary">
-						{{ loading ? 'Creating...' : 'Create Task' }}
+						{{ loading ? 'Создаём...' : 'Создать задание' }}
 					</button>
 					<router-link
 						to="/"
 						class="btn-outline"
-						>Cancel</router-link
+						>Отменить</router-link
 					>
 				</div>
 			</form>
@@ -139,7 +139,7 @@
 
 	const handleSubmit = async () => {
 		if (!form.value.id_subject) {
-			error.value = 'Please select a subject';
+			error.value = 'Выберите предмет';
 			return;
 		}
 
@@ -158,7 +158,7 @@
 		if (result.success) {
 			router.push(`/tasks/${result.data.id_task}`);
 		} else {
-			error.value = result.error || 'Failed to create task';
+			error.value = result.error || 'Не удалось создать задание';
 		}
 
 		loading.value = false;

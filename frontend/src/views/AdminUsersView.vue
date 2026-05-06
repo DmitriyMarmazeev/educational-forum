@@ -2,10 +2,10 @@
 	<div class="space-y-6 animate-fade-in">
 		<div class="glass-card p-6">
 			<h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-				User Management
+				Управление пользователями
 			</h1>
 			<p class="text-gray-600 dark:text-gray-400">
-				Manage user roles and permissions
+				Управляйте ролями и правами пользователей
 			</p>
 		</div>
 
@@ -24,10 +24,10 @@
 					<thead>
 						<tr class="border-b border-gray-200 dark:border-gray-700">
 							<th class="text-left py-3 px-4">ID</th>
-							<th class="text-left py-3 px-4">Name</th>
+							<th class="text-left py-3 px-4">Имя</th>
 							<th class="text-left py-3 px-4">Email</th>
-							<th class="text-left py-3 px-4">Role</th>
-							<th class="text-left py-3 px-4">Actions</th>
+							<th class="text-left py-3 px-4">Роль</th>
+							<th class="text-left py-3 px-4">Действия</th>
 						</tr>
 					</thead>
 					<tbody>
@@ -50,10 +50,10 @@
 									v-model="user.newRole"
 									@change="changeRole(user)"
 									class="input-field text-sm py-1 w-32">
-									<option value="user">User</option>
-									<option value="author">Author</option>
-									<option value="moderator">Moderator</option>
-									<option value="admin">Admin</option>
+									<option value="student">Студент</option>
+									<option value="author">Автор</option>
+									<option value="moderator">Модератор</option>
+									<option value="admin">Админ</option>
 								</select>
 							</td>
 						</tr>
@@ -89,7 +89,7 @@
 			const response = await adminApi.listAllUsers();
 			users.value = response.data.map((u) => ({ ...u, newRole: u.role_name }));
 		} catch (error) {
-			console.error('Failed to load users', error);
+			console.error('Не удалось загрузить пользователей', error);
 		} finally {
 			loading.value = false;
 		}
@@ -102,7 +102,7 @@
 			user.role_name = user.newRole;
 		} catch (error) {
 			user.newRole = user.role_name;
-			console.error('Failed to change role', error);
+			console.error('Не удалось изменить роль', error);
 		}
 	};
 

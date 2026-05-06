@@ -4,10 +4,10 @@
 		<div class="glass-card p-8 max-w-md w-full animate-slide-up">
 			<div class="text-center mb-8">
 				<h2 class="text-3xl font-bold text-gray-900 dark:text-white">
-					Welcome Back
+					Добро пожаловать!
 				</h2>
 				<p class="text-gray-600 dark:text-gray-400 mt-2">
-					Sign in to your account
+					Войдите в свою учетную запись
 				</p>
 			</div>
 
@@ -20,7 +20,7 @@
 						>Email</label
 					>
 					<input
-						type="email"
+						type="text"
 						v-model="form.email"
 						class="input-field"
 						:class="{ 'border-red-500': errors.email }"
@@ -36,7 +36,7 @@
 				<div>
 					<label
 						class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
-						>Password</label
+						>Пароль</label
 					>
 					<input
 						type="password"
@@ -62,17 +62,18 @@
 				<button
 					type="submit"
 					:disabled="authStore.loading"
-					class="btn-primary w-full">
-					{{ authStore.loading ? 'Signing in...' : 'Sign In' }}
+					class="btn-primary w-full"
+					data-test="submit">
+					{{ authStore.loading ? 'Входим...' : 'Войти' }}
 				</button>
 			</form>
 
 			<p class="text-center mt-6 text-gray-600 dark:text-gray-400">
-				Don't have an account?
+				Не имеете учетной записи?
 				<router-link
 					to="/register"
 					class="text-primary-500 hover:text-primary-600 font-semibold"
-					>Sign Up</router-link
+					>Зарегистрироваться</router-link
 				>
 			</p>
 		</div>
@@ -129,9 +130,10 @@
 		});
 
 		if (result.success) {
+			await authStore.fetchUser();
 			router.push('/');
 		} else {
-			if (result.error === 'Invalid email or password') {
+			if (result.error === 'Incorrect email or password') {
 				formError.value = 'Неверное имя пользователя или пароль';
 			} else {
 				formError.value = result.error;

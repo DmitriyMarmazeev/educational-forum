@@ -40,14 +40,16 @@ Cypress.Commands.add('errorShouldBeVisible', (errorSelector, errorText) => {
   cy.getByData(errorSelector).should('be.visible').should('contain', errorText);
 });
 
-Cypress.Commands.add('editField', (field, value) => {
+Cypress.Commands.add('editField', (field, value, shouldClear = true) => {
   cy.getByData(`${field}-edit`).click();
 
   cy.getByData(`${field}-input`).then(($input) => {
     const currentValue = $input.val();
 
-    cy.wrap($input).clear();
-
+    if (shouldClear) {
+      cy.wrap($input).clear();
+    }
+    
     if (value !== '' && value !== currentValue) {
       cy.wrap($input).type(value);
     }

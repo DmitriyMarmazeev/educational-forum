@@ -1,7 +1,7 @@
 describe('register page', () => {
   context('Client-side validation', () => {
     it('redirects to main on success', () => {
-      cy.registerUser({});
+      cy.registerUser({ email: `test_${Date.now()}@example.ru` });
       cy.location('pathname').should('eq', '/');
       cy.window().then((win) => {
         expect(win.localStorage.getItem('access_token')).to.exist;

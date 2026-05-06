@@ -2,11 +2,11 @@
 	<div class="space-y-6 animate-fade-in">
 		<div class="glass-card p-6">
 			<h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-				Task Moderation
+				Модерация заданий
 			</h1>
 			<p class="text-gray-600 dark:text-gray-400">
-				Review and manage submitted tasks
-			</p>
+        Проверяйте и управляйте отправленными заданиями
+      </p>
 		</div>
 
 		<div class="glass-card p-6">
@@ -15,11 +15,11 @@
 					v-model="statusFilter"
 					@change="loadTasks"
 					class="input-field w-48">
-					<option :value="null">All Status</option>
-					<option value="draft">Draft</option>
-					<option value="public">Public</option>
-					<option value="rejected">Rejected</option>
-					<option value="archived">Archived</option>
+					<option :value="null">Все статусы</option>
+					<option value="draft">Черновик</option>
+					<option value="public">Опубликовано</option>
+					<option value="rejected">Отклонено</option>
+					<option value="archived">В архиве</option>
 				</select>
 			</div>
 
@@ -33,7 +33,7 @@
 			<div
 				v-else-if="tasks.length === 0"
 				class="text-center py-8 text-gray-500">
-				No tasks to moderate
+				Нет заданий для модерации
 			</div>
 
 			<div
@@ -53,18 +53,18 @@
 								<span
 									class="text-xs font-semibold px-2 py-1 rounded"
 									:class="statusClass(task.status)">
-									{{ task.status }}
+									{{ getTaskStatus(task.status) }}
 								</span>
 							</div>
 							<h3 class="text-lg font-bold mb-2">
-								Task #{{ task.task_number }}
+								Задание №{{ task.task_number }}
 							</h3>
 							<p
 								class="text-gray-600 dark:text-gray-400 text-sm mb-2 line-clamp-2">
 								{{ task.condition }}
 							</p>
 							<p class="text-sm text-gray-500">
-								Author: {{ task.author_name || task.author_email }}
+								Автор: {{ task.author_name || task.author_email }}
 							</p>
 						</div>
 						<div class="flex gap-2">
@@ -72,15 +72,15 @@
 								v-model="task.newStatus"
 								@change="changeStatus(task)"
 								class="input-field text-sm py-1 w-28">
-								<option value="draft">Draft</option>
-								<option value="public">Approve</option>
-								<option value="rejected">Reject</option>
-								<option value="archived">Archive</option>
+								<option value="draft">Черновик</option>
+								<option value="public">Опубликовано</option>
+								<option value="rejected">Отклонено</option>
+								<option value="archived">В архиве</option>
 							</select>
 							<button
 								@click="deleteTask(task)"
 								class="btn-outline px-3 py-1 text-sm text-red-500">
-								Delete
+								Удалить
 							</button>
 						</div>
 					</div>
@@ -111,6 +111,16 @@
 		return classes[status] || classes.draft;
 	};
 
+  const getTaskStatus = (status) => {
+    const statusMap = {
+      draft: 'Черновик',
+      public: 'Опубликовано',
+      rejected: 'Отклонено',
+      archived: 'В архиве',
+    };
+    return statusMap[status] || 'Неизвестно';
+  };
+
 	const loadTasks = async () => {
 		loading.value = true;
 		try {
@@ -119,7 +129,7 @@
 			const response = await moderatorApi.getTasksForModeration(params);
 			tasks.value = response.data.map((t) => ({ ...t, newStatus: t.status }));
 		} catch (error) {
-			console.error('Failed to load tasks', error);
+			console.error('Не удалось загрузить задания', error);
 		} finally {
 			loading.value = false;
 		}
@@ -131,17 +141,17 @@
 			task.status = task.newStatus;
 		} catch (error) {
 			task.newStatus = task.status;
-			console.error('Failed to change status', error);
+			console.error('Не удалось изменить статус', error);
 		}
 	};
 
 	const deleteTask = async (task) => {
-		if (confirm('Are you sure you want to delete this task?')) {
+		if (confirm('Вы уверены, что хотите удалить это задание?')) {
 			try {
 				await moderatorApi.deleteTaskByModerator(task.id_task);
 				tasks.value = tasks.value.filter((t) => t.id_task !== task.id_task);
 			} catch (error) {
-				console.error('Failed to delete task', error);
+				console.error('Не удалось удалить задание', error);
 			}
 		}
 	};

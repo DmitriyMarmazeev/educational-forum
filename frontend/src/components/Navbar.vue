@@ -29,7 +29,7 @@
 					<router-link
 						to="/"
 						class="text-gray-700 dark:text-gray-300 hover:text-primary-500 dark:hover:text-primary-500 transition-colors">
-						Tasks
+						Задания
 					</router-link>
 
 					<template v-if="authStore.isAuthenticated">
@@ -37,19 +37,19 @@
 							v-if="authStore.isAuthor"
 							to="/tasks/create"
 							class="text-gray-700 dark:text-gray-300 hover:text-primary-500 transition-colors">
-							Create Task
+							Создать задание
 						</router-link>
 						<router-link
 							v-if="authStore.isModerator"
 							to="/moderation/tasks"
 							class="text-gray-700 dark:text-gray-300 hover:text-primary-500 transition-colors">
-							Moderation
+							Модерация
 						</router-link>
 						<router-link
 							v-if="authStore.isAdmin"
 							to="/admin/users"
 							class="text-gray-700 dark:text-gray-300 hover:text-primary-500 transition-colors">
-							Admin
+							Управление пользователями
 						</router-link>
 						<router-link
 							to="/profile"
@@ -65,12 +65,12 @@
 						<router-link
 							to="/login"
 							class="text-gray-700 dark:text-gray-300 hover:text-primary-500 transition-colors">
-							Login
+							Войти
 						</router-link>
 						<router-link
 							to="/register"
 							class="btn-primary px-4 py-2 text-sm">
-							Sign Up
+							Зарегистрироваться
 						</router-link>
 					</template>
 				</div>

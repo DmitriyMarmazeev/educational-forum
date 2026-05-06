@@ -4,10 +4,10 @@
 		<div class="glass-card p-8 max-w-md w-full animate-slide-up">
 			<div class="text-center mb-8">
 				<h2 class="text-3xl font-bold text-gray-900 dark:text-white">
-					Create Account
+					Создать аккаунт
 				</h2>
 				<p class="text-gray-600 dark:text-gray-400 mt-2">
-					Join our educational community
+					Присоединяйтесь к нашему образовательному форуму
 				</p>
 			</div>
 
@@ -20,7 +20,7 @@
 						>Email</label
 					>
 					<input
-						type="email"
+						type="text"
 						v-model="form.email"
 						class="input-field"
 						:class="{ 'border-red-500': errors.email }"
@@ -36,7 +36,7 @@
 				<div>
 					<label
 						class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
-						>Name</label
+						>Имя</label
 					>
 					<input
 						type="text"
@@ -55,7 +55,7 @@
 				<div>
 					<label
 						class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
-						>Surname</label
+						>Фамилия</label
 					>
 					<input
 						type="text"
@@ -74,7 +74,7 @@
 				<div>
 					<label
 						class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
-						>Password</label
+						>Пароль</label
 					>
 					<input
 						type="password"
@@ -93,7 +93,7 @@
 				<div>
 					<label
 						class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
-						>Confirm Password</label
+						>Подтвердите пароль</label
 					>
 					<input
 						type="password"
@@ -119,17 +119,18 @@
 				<button
 					type="submit"
 					:disabled="authStore.loading"
-					class="btn-primary w-full">
-					{{ authStore.loading ? 'Creating account...' : 'Sign Up' }}
+					class="btn-primary w-full"
+					data-test="submit">
+					{{ authStore.loading ? 'Создаём аккаунт...' : 'Зарегистрироваться' }}
 				</button>
 			</form>
 
 			<p class="text-center mt-6 text-gray-600 dark:text-gray-400">
-				Already have an account?
+				Уже есть аккаунт?
 				<router-link
 					to="/login"
 					class="text-primary-500 hover:text-primary-600 font-semibold"
-					>Sign In</router-link
+					>Войти</router-link
 				>
 			</p>
 		</div>
@@ -218,8 +219,9 @@
 		});
 
 		if (result.success) {
+			await authStore.fetchUser();
 			router.push('/');
-		} else if (result.error.includes('already exists')) {
+		} else if (result.error === 'Email already registered') {
 			formError.value = 'Пользователь с таким email уже существует';
 		} else {
 			formError.value = result.error;
