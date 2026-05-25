@@ -32,7 +32,7 @@ class User(Base):
     name = Column(String(100), nullable=False)
     surname = Column(String(100), nullable=False)
     password = Column(String, nullable=False)   # хеш
-    wallet = Column(String(100), nullable=True)      # заглушка для выплат
+    wallet = Column(Integer, nullable=True)      # заглушка для выплат
     subscribed_until_date = Column(DateTime(timezone=True), nullable=True)
     id_role = Column(Integer, ForeignKey("roles.id_role"), nullable=False)
     is_deleted = Column(Boolean, default=False)      # флаг удалённого аккаунта

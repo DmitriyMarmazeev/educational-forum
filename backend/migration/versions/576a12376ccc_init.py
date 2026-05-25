@@ -41,7 +41,7 @@ def upgrade() -> None:
     sa.Column('name', sa.String(length=100), nullable=False),
     sa.Column('surname', sa.String(length=100), nullable=False),
     sa.Column('password', sa.String(), nullable=False),
-    sa.Column('wallet', sa.String(length=100), nullable=True),
+    sa.Column('wallet', sa.Integer(), nullable=True),
     sa.Column('subscribed_until_date', sa.DateTime(timezone=True), nullable=True),
     sa.Column('id_role', sa.Integer(), nullable=False),
     sa.Column('is_deleted', sa.Boolean(), nullable=True),

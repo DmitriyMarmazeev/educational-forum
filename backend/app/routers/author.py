@@ -30,10 +30,21 @@ async def get_author_stats(
 @router.post("/payout", status_code=200)
 async def request_payout(
     current_user: User = Depends(auth.author_or_above),
+    db: AsyncSession = Depends(get_db)
 ):
-    # Заглушка
-    return {"message": "Payout request received (stub)"}
+    try:
+        balance = current_user.wallet if current_user.wallet else 0.0
+    except (ValueError, TypeError):
+        balance = 0.0
 
+    if balance <= 0:
+        raise HTTPException(status_code=400, detail="No funds to withdraw")
+
+    # Обнуляем кошелёк
+    current_user.wallet = 0
+    await db.commit()
+
+    return {"message": f"{balance:.2f} рублей перечислено вам на карту", "paid_amount": balance}
 @router.get("/tasks", response_model=List[schemas.TaskOut])
 async def get_my_tasks(
     skip: int = Query(0, ge=0),
