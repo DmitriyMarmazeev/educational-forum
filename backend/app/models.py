@@ -16,7 +16,7 @@ class RoleEnum(str, enum.Enum):
     STUDENT = "student"
     AUTHOR = "author"
     ADMIN = "admin"
-    MODERATOR = "moderator"   # на будущее
+    MODERATOR = "moderator"
 
 class Role(Base):
     __tablename__ = "roles"

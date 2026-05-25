@@ -52,7 +52,7 @@ def upgrade():
     ]  # замените на свои
 
     to_insert_subjects = [
-        {'subject_name': s, 'count_of_tasks': 0}
+        {'subject_name': s, 'count_of_tasks': 20}
         for s in needed_subjects if s not in existing_subjects
     ]
     if to_insert_subjects:

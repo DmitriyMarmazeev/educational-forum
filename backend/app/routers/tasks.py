@@ -1,3 +1,5 @@
+from datetime import datetime, timezone
+
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from typing import Optional, List
@@ -77,8 +79,27 @@ async def create_task(
     db: AsyncSession = Depends(get_db)
 ):
     task = await crud.create_task(db, task_data, current_user.id_user)
-    # возвращаем созданную задачу
-    return await get_task(task.id_task, db)
+    if not task:
+        raise HTTPException(status_code=400, detail="Invalid task number for this subject")
+    
+    # Получаем дополнительные данные для ответа (аналогично get_task но без лишних вызовов)
+    author_name = f"{current_user.name} {current_user.surname}" if not current_user.is_deleted else "Удалённый аккаунт"
+    avg_rating = await crud.get_average_rating(db, task.id_task)
+    comments_count = await crud.get_comments_count(db, task.id_task)
+    subject = await db.get(crud.Subject, task.id_subject)
+    
+    return schemas.TaskOut(
+        id_task=task.id_task,
+        condition=task.condition,
+        image=task.image,
+        answer=task.answer,
+        task_number=task.task_number,
+        status=task.status,
+        author_name=author_name,
+        subject_name=subject.subject_name if subject else "",
+        average_rating=avg_rating,
+        comments_count=comments_count
+    )
 
 @router.put("/{task_id}", response_model=schemas.TaskOut)
 async def update_task(
@@ -89,8 +110,31 @@ async def update_task(
 ):
     task = await crud.update_task(db, task_id, task_update, current_user.id_user)
     if not task:
-        raise HTTPException(status_code=404, detail="Task not found or not owned by you")
-    return await get_task(task.id_task, db)
+        raise HTTPException(status_code=404, detail="Task not found, not owned by you, or invalid update data")
+    
+    # Получаем автора для имени (может быть текущий, но если автор удалён — имя из БД)
+    author = await crud.get_user_by_id(db, task.id_user)
+    if author and not author.is_deleted:
+        author_name = f"{author.name} {author.surname}"
+    else:
+        author_name = "Удалённый аккаунт"
+    
+    avg_rating = await crud.get_average_rating(db, task.id_task)
+    comments_count = await crud.get_comments_count(db, task.id_task)
+    subject = await db.get(crud.Subject, task.id_subject)
+    
+    return schemas.TaskOut(
+        id_task=task.id_task,
+        condition=task.condition,
+        image=task.image,
+        answer=task.answer,
+        task_number=task.task_number,
+        status=task.status,
+        author_name=author_name,
+        subject_name=subject.subject_name if subject else "",
+        average_rating=avg_rating,
+        comments_count=comments_count
+    )
 
 @router.delete("/{task_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_task(
@@ -126,7 +170,7 @@ async def get_task_solution(
     )
     is_author = current_user.id_user == task.id_user
     # Привилегированные роли тоже могут видеть (авторы и админы)
-    is_privileged = current_user.role.role_name in ["admin"]
+    is_privileged = current_user.role.role_name in ["admin", "moderator"]
 
     if not (has_subscription or is_author or is_privileged):
         raise HTTPException(

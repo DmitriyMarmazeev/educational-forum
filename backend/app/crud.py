@@ -67,6 +67,26 @@ async def soft_delete_user(db: AsyncSession, user: User):
     user.subscribed_until_date = None
     await db.commit()
 
+async def get_all_tasks_by_author(
+    db: AsyncSession,
+    author_id: int,
+    skip: int = 0,
+    limit: int = 100
+) -> List[Task]:
+    """
+    Возвращает все задачи автора (любой статус) с подгрузкой предмета.
+    """
+    query = (
+        select(Task)
+        .options(joinedload(Task.subject))
+        .where(Task.id_user == author_id)
+        .order_by(Task.id_task.desc())
+        .offset(skip)
+        .limit(limit)
+    )
+    result = await db.execute(query)
+    return result.unique().scalars().all()
+
 # ---------- Subjects ----------
 async def get_subjects(db: AsyncSession) -> List[Subject]:
     result = await db.execute(select(Subject).order_by(Subject.subject_name))
@@ -109,50 +129,80 @@ async def get_task_detail(db: AsyncSession, task_id: int) -> Optional[Task]:
     result = await db.execute(query)
     return result.unique().scalar_one_or_none()
 
+async def get_author_task_detail(db: AsyncSession, task_id: int) -> Optional[Task]:
+    query = (
+        select(Task)
+        .options(joinedload(Task.subject), joinedload(Task.author))
+        .where(Task.id_task == task_id)
+    )
+    result = await db.execute(query)
+    return result.unique().scalar_one_or_none()
+
 async def get_task_by_id(db: AsyncSession, task_id: int) -> Optional[Task]:
     result = await db.execute(select(Task).where(Task.id_task == task_id))
     return result.scalar_one_or_none()
 
-async def create_task(db: AsyncSession, task_data: TaskCreate, user_id: int) -> Task:
-    task = Task(**task_data.dict(), id_user=user_id, status="active")
+async def create_task(db: AsyncSession, task_data: TaskCreate, user_id: int) -> Optional[Task]:
+    """
+    Создаёт новую задачу. Проверяет, что task_number не превышает max_number (count_of_tasks) предмета.
+    """
+    subject = await db.get(Subject, task_data.id_subject)
+    if not subject:
+        return None
+    if not (1 <= task_data.task_number <= subject.count_of_tasks):
+        return None
+
+    task = Task(
+        **task_data.dict(),
+        id_user=user_id,
+        status=TaskStatus.draft
+    )
     db.add(task)
     await db.commit()
     await db.refresh(task)
-    # Обновить счётчик задач в предмете
-    subject = await db.get(Subject, task.id_subject)
-    if subject:
-        subject.count_of_tasks += 1
-        await db.commit()
     return task
 
 async def update_task(db: AsyncSession, task_id: int, task_update: TaskUpdate, user_id: int) -> Optional[Task]:
-    task = await get_task_by_id(db, task_id)
+    """
+    Обновляет задачу. При изменении номера или предмета проверяет,
+    что новый номер лежит в пределах count_of_tasks соответствующего предмета.
+    """
+    task = await get_task_by_id(db, task_id)  # предполагается, что функция определена выше
     if not task or task.id_user != user_id:
         return None
+
     update_data = task_update.dict(exclude_unset=True)
+    new_task_number = update_data.get("task_number", task.task_number)
+    new_subject_id = update_data.get("id_subject", task.id_subject)
+    if new_subject_id != task.id_subject or new_task_number != task.task_number:
+        subject = await db.get(Subject, new_subject_id)
+        if not subject:
+            return None
+        if not (1 <= new_task_number <= subject.count_of_tasks):
+            return None
+
     for field, value in update_data.items():
         setattr(task, field, value)
-    # Если задача была публичной, после редактирования отправляем на модерацию
     if task.status == TaskStatus.public:
         task.status = TaskStatus.draft
+
     await db.commit()
     await db.refresh(task)
     return task
 
 async def delete_task_by_author(db: AsyncSession, task_id: int, user_id: int) -> bool:
+    """
+    Удаляет задачу автора. Связанные данные удаляются каскадно.
+    count_of_tasks в предмете НЕ уменьшается, так как это максимальный номер, а не счётчик.
+    """
     task = await get_task_by_id(db, task_id)
     if not task or task.id_user != user_id:
         return False
-    # Удалить связанные данные
     await db.execute(delete(TaskComment).where(TaskComment.id_task == task_id))
     await db.execute(delete(TaskRating).where(TaskRating.id_task == task_id))
     await db.execute(delete(ViewHistory).where(ViewHistory.id_task == task_id))
     await db.execute(delete(SolutionView).where(SolutionView.id_task == task_id))
     await db.delete(task)
-    # Уменьшить счётчик
-    subject = await db.get(Subject, task.id_subject)
-    if subject:
-        subject.count_of_tasks = max(0, subject.count_of_tasks - 1)
     await db.commit()
     return True
 
@@ -260,7 +310,7 @@ async def create_comment(db: AsyncSession, task_id: int, user_id: int, comment_t
 # ---------- Stats for author ----------
 async def get_tasks_by_author(db: AsyncSession, author_id: int) -> List[Task]:
     result = await db.execute(
-        select(Task).where(Task.id_user == author_id, Task.status == "active")
+        select(Task).where(Task.id_user == author_id, Task.status == "public")
     )
     return result.scalars().all()
 
