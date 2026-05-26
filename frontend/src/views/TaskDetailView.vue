@@ -63,6 +63,26 @@
 						{{ task.condition }}
 					</p>
 
+					<template v-if="task.image && task.image.trim()">
+						<h3
+							class="text-lg font-semibold mt-6 mb-2 text-gray-900 dark:text-white">
+							Изображение
+						</h3>
+						<div
+							class="mt-2 mb-6 rounded-xl overflow-hidden">
+							<img
+								:src="task.image"
+								:alt="`Изображение к заданию №${task.task_number}`"
+								class="max-w-full h-auto object-contain rounded-lg max-h-96"
+								@error="handleImageError" />
+						</div>
+						<p
+							v-if="imageError"
+							class="text-sm text-red-500 mt-2">
+							Не удалось загрузить изображение. Проверьте ссылку.
+						</p>
+					</template>
+
 					<h3
 						class="text-lg font-semibold mt-6 mb-2 text-gray-900 dark:text-white">
 						Ответ
@@ -129,7 +149,7 @@
 
 				<div
 					v-if="isOwner"
-					class="flex gap-4 mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
+					class="flex gap-4 mt-6 pt-6 border-t border-gray-200 dark:border-gray-700 flex-wrap">
 					<router-link
 						:to="`/tasks/${task.id_task}/edit`"
 						class="btn-outline">
@@ -172,7 +192,7 @@
 						class="text-primary-500"
 						>Войти</router-link
 					>
-          чтобы оставить комментарий
+					чтобы оставить комментарий
 				</div>
 
 				<div
@@ -234,7 +254,8 @@
 					Удалить задание
 				</h3>
 				<p class="text-gray-600 dark:text-gray-400 mb-6">
-					Вы уверены, что хотите удалить это задание? Это действие нельзя отменить.
+					Вы уверены, что хотите удалить это задание? Это действие нельзя
+					отменить.
 				</p>
 				<div class="flex gap-4 justify-end">
 					<button
@@ -283,10 +304,15 @@
 	const subscribing = ref(false);
 	const userRating = ref(null);
 	const deletingCommentId = ref(null);
+	const imageError = ref(false);
 
 	const isOwner = computed(() => {
 		if (!task.value || !authStore.user) return false;
-		return authStore.user.id_user === task.value.author_id;
+		return (
+			authStore.user.id_user === task.value.author_id ||
+			`${authStore.user.name} ${authStore.user.surname}` ===
+				task.value.author_name
+		);
 	});
 
 	const isRegularUser = computed(() => {
@@ -333,6 +359,7 @@
 			const result = await tasksStore.fetchTask(taskId);
 			if (result.success && result.data) {
 				task.value = result.data;
+				console.log(result.data);
 			} else {
 				error.value = result.error || 'Задание не найдено';
 			}
@@ -463,6 +490,10 @@
 		} finally {
 			deleteLoading.value = false;
 		}
+	};
+
+	const handleImageError = () => {
+		imageError.value = true;
 	};
 
 	onMounted(async () => {

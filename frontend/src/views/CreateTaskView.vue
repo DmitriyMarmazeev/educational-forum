@@ -99,7 +99,7 @@
 					{{ error }}
 				</div>
 
-				<div class="flex gap-4">
+				<div class="flex gap-4 flex-wrap">
 					<button
 						type="submit"
 						:disabled="loading"

@@ -2,6 +2,16 @@
 	<router-link
 		:to="`/tasks/${task.id_task}`"
 		class="glass-card p-6 hover:scale-[1.02] transition-all duration-300 block group">
+		<div
+			v-if="task.image && task.image.trim()"
+			class="mb-4 -mt-2 -mx-2 rounded-xl overflow-hidden">
+			<img
+				:src="task.image"
+				:alt="`Изображение к заданию ${task.task_number}`"
+				class="w-full h-40 object-cover group-hover:scale-105 transition-transform duration-300"
+				@error="handleImageError" />
+		</div>
+
 		<div class="flex justify-between items-start mb-4">
 			<span
 				class="text-xs font-semibold px-2 py-1 bg-primary-100 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400 rounded-lg">
@@ -39,10 +49,37 @@
 </template>
 
 <script setup>
-	defineProps({
+	import { ref } from 'vue';
+
+	const props = defineProps({
 		task: {
 			type: Object,
 			required: true,
 		},
 	});
+
+	const imageError = ref(false);
+
+	const handleImageError = () => {
+		imageError.value = true;
+		console.warn(
+			`Не удалось загрузить изображение для задания ${props.task.id_task}`,
+		);
+	};
 </script>
+
+<style scoped>
+	.line-clamp-2 {
+		display: -webkit-box;
+		-webkit-line-clamp: 2;
+		-webkit-box-orient: vertical;
+		overflow: hidden;
+	}
+
+	.line-clamp-3 {
+		display: -webkit-box;
+		-webkit-line-clamp: 3;
+		-webkit-box-orient: vertical;
+		overflow: hidden;
+	}
+</style>

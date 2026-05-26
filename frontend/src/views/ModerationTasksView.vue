@@ -5,8 +5,8 @@
 				Модерация заданий
 			</h1>
 			<p class="text-gray-600 dark:text-gray-400">
-        Проверяйте и управляйте отправленными заданиями
-      </p>
+				Проверяйте и управляйте отправленными заданиями
+			</p>
 		</div>
 
 		<div class="glass-card p-6">
@@ -43,9 +43,10 @@
 					v-for="task in tasks"
 					:key="task.id_task"
 					class="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
-					<div class="flex justify-between items-start">
+					<div
+						class="flex flex-col-reverse sm:flex-row justify-between items-start">
 						<div class="flex-1">
-							<div class="flex items-center gap-2 mb-2">
+							<div class="flex items-center gap-2 mb-4 flex-wrap">
 								<span
 									class="text-xs font-semibold px-2 py-1 bg-gray-100 dark:bg-gray-800 rounded"
 									>{{ task.subject_name }}</span
@@ -56,22 +57,37 @@
 									{{ getTaskStatus(task.status) }}
 								</span>
 							</div>
-							<h3 class="text-lg font-bold mb-2">
+							<h3 class="text-lg font-bold mb-3">
 								Задание №{{ task.task_number }}
 							</h3>
+							<div
+								v-if="
+									task.image && task.image.trim() && !imageErrors[task.id_task]
+								"
+								class="mb-3 rounded-lg overflow-hidden inline-block">
+								<img
+									:src="task.image"
+									:alt="`Изображение к заданию ${task.task_number}`"
+									class="w-full h-32 object-cover"
+									@error="handleImageError(task.id_task)" />
+							</div>
 							<p
 								class="text-gray-600 dark:text-gray-400 text-sm mb-2 line-clamp-2">
-								{{ task.condition }}
+								Условие: {{ task.condition }}
 							</p>
-							<p class="text-sm text-gray-500">
+							<p
+								class="text-gray-600 dark:text-gray-400 text-sm mb-2 line-clamp-2">
+								Ответ: {{ task.answer }}
+							</p>
+							<p class="text-sm text-gray-600">
 								Автор: {{ task.author_name || task.author_email }}
 							</p>
 						</div>
-						<div class="flex gap-2">
+						<div class="flex gap-2 mb-4 sm:mb-0">
 							<select
 								v-model="task.newStatus"
 								@change="changeStatus(task)"
-								class="input-field text-sm py-1 w-28">
+								class="input-field text-sm py-1 w-3/5">
 								<option value="draft">Черновик</option>
 								<option value="public">Опубликовано</option>
 								<option value="rejected">Отклонено</option>
@@ -79,7 +95,7 @@
 							</select>
 							<button
 								@click="deleteTask(task)"
-								class="btn-outline px-3 py-1 text-sm text-red-500">
+								class="btn-outline px-3 py-1 text-sm text-red-500 w-2/5">
 								Удалить
 							</button>
 						</div>
@@ -97,6 +113,7 @@
 	const tasks = ref([]);
 	const loading = ref(false);
 	const statusFilter = ref(null);
+	const imageErrors = ref({});
 
 	const statusClass = (status) => {
 		const classes = {
@@ -111,15 +128,20 @@
 		return classes[status] || classes.draft;
 	};
 
-  const getTaskStatus = (status) => {
-    const statusMap = {
-      draft: 'Черновик',
-      public: 'Опубликовано',
-      rejected: 'Отклонено',
-      archived: 'В архиве',
-    };
-    return statusMap[status] || 'Неизвестно';
-  };
+	const getTaskStatus = (status) => {
+		const statusMap = {
+			draft: 'Черновик',
+			public: 'Опубликовано',
+			rejected: 'Отклонено',
+			archived: 'В архиве',
+		};
+		return statusMap[status] || 'Неизвестно';
+	};
+
+	const handleImageError = (taskId) => {
+		imageErrors.value[taskId] = true;
+		console.warn(`Не удалось загрузить изображение для задания ${taskId}`);
+	};
 
 	const loadTasks = async () => {
 		loading.value = true;
@@ -128,6 +150,8 @@
 			if (statusFilter.value) params.status = statusFilter.value;
 			const response = await moderatorApi.getTasksForModeration(params);
 			tasks.value = response.data.map((t) => ({ ...t, newStatus: t.status }));
+			// Сбрасываем ошибки изображений при загрузке новых заданий
+			imageErrors.value = {};
 		} catch (error) {
 			console.error('Не удалось загрузить задания', error);
 		} finally {
@@ -160,3 +184,12 @@
 		loadTasks();
 	});
 </script>
+
+<style scoped>
+	.line-clamp-2 {
+		display: -webkit-box;
+		-webkit-line-clamp: 2;
+		-webkit-box-orient: vertical;
+		overflow: hidden;
+	}
+</style>

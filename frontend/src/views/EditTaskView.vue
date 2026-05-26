@@ -22,7 +22,7 @@
 			v-else-if="task"
 			class="glass-card p-8">
 			<h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-        Редактировать задание
+				Редактировать задание
 			</h1>
 			<p class="text-gray-600 dark:text-gray-400 mb-8">Обновить задание</p>
 
@@ -108,12 +108,12 @@
 					{{ submitError }}
 				</div>
 
-				<div class="flex gap-4">
+				<div class="flex gap-4 flex-wrap">
 					<button
 						type="submit"
 						:disabled="submitting"
 						class="btn-primary">
-						{{ submitting ? 'Saving...' : 'Save Changes' }}
+						{{ submitting ? 'Сохранение...' : 'Сохранить' }}
 					</button>
 					<router-link
 						:to="`/tasks/${taskId}`"
@@ -140,7 +140,8 @@
 					Удалить задание
 				</h3>
 				<p class="text-gray-600 dark:text-gray-400 mb-6">
-					Вы уверены, что хотите удалить это задание? Это действие нельзя отменить.
+					Вы уверены, что хотите удалить это задание? Это действие нельзя
+					отменить.
 				</p>
 				<div class="flex gap-4 justify-end">
 					<button
@@ -152,7 +153,7 @@
 						@click="confirmDelete"
 						:disabled="deleteLoading"
 						class="btn-primary px-4 py-2 bg-red-500 hover:bg-red-600">
-						{{ deleteLoading ? 'Deleting...' : 'Delete' }}
+						{{ deleteLoading ? 'Удаление...' : 'Удалить' }}
 					</button>
 				</div>
 			</div>
@@ -176,13 +177,14 @@
 	const loading = ref(true);
 	const error = ref('');
 	const task = ref(null);
+	const prevSolution = ref('');
 	const form = ref({
 		condition: '',
 		image: '',
 		answer: '',
+		solution: '',
 		task_number: null,
 		id_subject: null,
-		solution: '',
 	});
 	const submitting = ref(false);
 	const submitError = ref('');
@@ -192,7 +194,10 @@
 	const canDelete = computed(() => {
 		if (!task.value || !authStore.user) return false;
 		return (
-			authStore.isModerator || authStore.user.id_user === task.value.author_id
+			authStore.isModerator ||
+			authStore.user.id_user === task.value.author_id ||
+			`${authStore.user.name} ${authStore.user.surname}` ===
+				task.value.author_name
 		);
 	});
 
@@ -208,9 +213,9 @@
 					condition: result.data.condition || '',
 					image: result.data.image || '',
 					answer: result.data.answer || '',
+					solution: result.data.solution || '',
 					task_number: result.data.task_number || null,
 					id_subject: null,
-					solution: '',
 				};
 			} else {
 				error.value = result.error || 'Задание не найдено';
@@ -229,6 +234,21 @@
 		}
 	};
 
+	const loadSolution = async () => {
+		try {
+			const result = await tasksStore.fetchSolution(taskId);
+			if (result.success && result.data) {
+				form.value.solution = result.data.solution;
+				prevSolution.value = result.data.solution;
+			} else {
+				alert(result.error || 'Не удалось загрузить решение');
+			}
+		} catch (err) {
+			alert('Не удалось загрузить решение');
+			console.error(err);
+		}
+	};
+
 	const handleSubmit = async () => {
 		submitting.value = true;
 		submitError.value = '';
@@ -240,6 +260,11 @@
 			updateData.image = form.value.image;
 		if (form.value.answer !== task.value.answer)
 			updateData.answer = form.value.answer;
+		if (
+			form.value.solution !== prevSolution.value &&
+			form.value.solution.trim() !== ''
+		)
+			updateData.solution = form.value.solution;
 		if (form.value.task_number !== task.value.task_number)
 			updateData.task_number = form.value.task_number;
 		if (form.value.id_subject)
@@ -254,7 +279,7 @@
 		const result = await tasksStore.updateTask(taskId, updateData);
 
 		if (result.success) {
-			router.push(`/tasks/${taskId}`);
+			router.push(`/`);
 		} else {
 			submitError.value = result.error || 'Не удалось обновить задание';
 		}
@@ -276,5 +301,6 @@
 
 	onMounted(() => {
 		loadTask();
+		loadSolution();
 	});
 </script>
