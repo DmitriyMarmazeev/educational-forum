@@ -309,9 +309,7 @@
 	const isOwner = computed(() => {
 		if (!task.value || !authStore.user) return false;
 		return (
-			authStore.user.id_user === task.value.author_id ||
-			`${authStore.user.name} ${authStore.user.surname}` ===
-				task.value.author_name
+			authStore.user.id_user === task.value.author_id
 		);
 	});
 

@@ -121,7 +121,6 @@
 						>Отменить</router-link
 					>
 					<button
-						v-if="canDelete"
 						type="button"
 						@click="showDeleteModal = true"
 						class="btn-outline text-red-500 border-red-500 hover:bg-red-50">
@@ -165,12 +164,10 @@
 	import { ref, computed, onMounted } from 'vue';
 	import { useRoute, useRouter } from 'vue-router';
 	import { useTasksStore } from '../stores/tasks';
-	import { useAuthStore } from '../stores/auth';
 
 	const route = useRoute();
 	const router = useRouter();
 	const tasksStore = useTasksStore();
-	const authStore = useAuthStore();
 
 	const taskId = route.params.id;
 
@@ -190,16 +187,6 @@
 	const submitError = ref('');
 	const showDeleteModal = ref(false);
 	const deleteLoading = ref(false);
-
-	const canDelete = computed(() => {
-		if (!task.value || !authStore.user) return false;
-		return (
-			authStore.isModerator ||
-			authStore.user.id_user === task.value.author_id ||
-			`${authStore.user.name} ${authStore.user.surname}` ===
-				task.value.author_name
-		);
-	});
 
 	const loadTask = async () => {
 		loading.value = true;

@@ -1,4 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router';
+import { useAuthStore } from '../stores/auth';
+import { useTasksStore } from '../stores/tasks';
 
 const routes = [
 	{
@@ -41,7 +43,7 @@ const routes = [
 		path: '/tasks/:id/edit',
 		name: 'EditTask',
 		component: () => import('../views/EditTaskView.vue'),
-		meta: { requiresAuth: true, title: 'Edit Task' },
+		meta: { requiresAuth: true, requiresOwner: true, title: 'Edit Task' },
 	},
 	{
 		path: '/moderation/tasks',
@@ -73,6 +75,16 @@ const routes = [
 			title: 'User Management',
 		},
 	},
+	{
+		path: '/404',
+		name: 'NotFound',
+		component: () => import('../views/NotFoundView.vue'),
+		meta: { title: 'Страница не найдена' },
+	},
+	{
+		path: '/:pathMatch(.*)*',
+		redirect: '/404',
+	},
 ];
 
 const router = createRouter({
@@ -80,18 +92,71 @@ const router = createRouter({
 	routes,
 });
 
-router.beforeEach((to, from, next) => {
+router.beforeEach(async (to, from, next) => {
 	const token = localStorage.getItem('access_token');
 	const isAuthenticated = !!token;
+	const authStore = useAuthStore();
+
+	if (isAuthenticated && !authStore.user) {
+		await authStore.fetchUser();
+	}
+
+	if (to.meta.guestOnly && isAuthenticated) {
+		next('/');
+		return;
+	}
 
 	if (to.meta.requiresAuth && !isAuthenticated) {
 		next('/login');
-	} else if (to.meta.guestOnly && isAuthenticated) {
-		next('/');
-	} else {
-		document.title = `${to.meta.title || 'Educational Forum'} | Educational Forum`;
-		next();
+		return;
 	}
+
+	if (to.meta.requiresAuthor && isAuthenticated) {
+		if (!authStore.isAuthor && !authStore.isModerator && !authStore.isAdmin) {
+			next('/404');
+			return;
+		}
+	}
+
+	if (to.meta.requiresModerator && isAuthenticated) {
+		if (!authStore.isModerator && !authStore.isAdmin) {
+			next('/404');
+			return;
+		}
+	}
+
+	if (to.meta.requiresAdmin && isAuthenticated) {
+		if (!authStore.isAdmin) {
+			next('/404');
+			return;
+		}
+	}
+
+	if (to.meta.requiresOwner && isAuthenticated && authStore.user) {
+		const taskId = to.params.id;
+		if (taskId) {
+			const tasksStore = useTasksStore();
+			try {
+				const result = await tasksStore.fetchTask(taskId);
+				if (result.success && result.data) {
+					const isOwner = authStore.user.id_user === result.data.author_id;
+					if (!isOwner) {
+						next('/404');
+						return;
+					}
+				} else {
+					next('/404');
+					return;
+				}
+			} catch (error) {
+				next('/404');
+				return;
+			}
+		}
+	}
+
+	document.title = `${to.meta.title || 'Образовательный форум'} | Зов Знаний`;
+	next();
 });
 
 export default router;
