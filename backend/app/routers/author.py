@@ -77,7 +77,8 @@ async def get_my_tasks(
             author_name=author_name,
             subject_name=task.subject.subject_name if task.subject else "",
             average_rating=avg_rating,
-            comments_count=comments_count
+            comments_count=comments_count,
+            author_id=current_user.id_user
         ))
     return result
 
@@ -111,5 +112,6 @@ async def get_task(
         author_name=author_name,
         subject_name=task.subject.subject_name,
         average_rating=avg_rating,
-        comments_count=comments_count
+        comments_count=comments_count,
+        author_id=current_user.id_user
     )

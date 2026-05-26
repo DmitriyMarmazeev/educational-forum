@@ -92,6 +92,7 @@ class TaskOut(BaseModel):
     image: Optional[str] = None
     answer: str
     task_number: int
+    author_id: int
     status: TaskStatusEnum
     author_name: Optional[str] = None      # "Удалённый аккаунт" если автор удалён
     subject_name: str
@@ -160,7 +161,6 @@ class CommentModeratorOut(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
 class TaskModeratorOut(TaskOut):
-    author_id: int
     author_email: Optional[str] = None
     created_at: Optional[datetime] = None
     updated_at: Optional[datetime] = None

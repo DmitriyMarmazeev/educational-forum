@@ -36,7 +36,8 @@ async def list_tasks(
             author_name=author_name,
             subject_name=task.subject.subject_name,
             average_rating=avg_rating,
-            comments_count=comments_count
+            comments_count=comments_count,
+            author_id=task.author.id_user
         ))
     return result
 
@@ -69,7 +70,8 @@ async def get_task(
         author_name=author_name,
         subject_name=task.subject.subject_name,
         average_rating=avg_rating,
-        comments_count=comments_count
+        comments_count=comments_count,
+        author_id=task.author.id_user
     )
 
 @router.post("/", response_model=schemas.TaskOut, status_code=status.HTTP_201_CREATED)
@@ -98,7 +100,8 @@ async def create_task(
         author_name=author_name,
         subject_name=subject.subject_name if subject else "",
         average_rating=avg_rating,
-        comments_count=comments_count
+        comments_count=comments_count,
+        author_id=task.author.id_user
     )
 
 @router.put("/{task_id}", response_model=schemas.TaskOut)
@@ -133,7 +136,8 @@ async def update_task(
         author_name=author_name,
         subject_name=subject.subject_name if subject else "",
         average_rating=avg_rating,
-        comments_count=comments_count
+        comments_count=comments_count,
+        author_id=task.author.id_user
     )
 
 @router.delete("/{task_id}", status_code=status.HTTP_204_NO_CONTENT)
