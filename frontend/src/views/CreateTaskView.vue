@@ -39,7 +39,7 @@
 						v-model="form.task_number"
 						class="input-field"
 						required
-						placeholder="e.g., 42" />
+						placeholder="Например, 10" />
 				</div>
 
 				<div>
@@ -52,7 +52,7 @@
 						rows="6"
 						class="input-field"
 						required
-						placeholder="Describe the problem in detail..."></textarea>
+						placeholder="Напишите условие задачи..."></textarea>
 				</div>
 
 				<div>
@@ -65,7 +65,7 @@
 						v-model="form.answer"
 						class="input-field"
 						required
-						placeholder="The correct answer" />
+						placeholder="Правильный ответ" />
 				</div>
 
 				<div>
@@ -78,7 +78,7 @@
 						rows="4"
 						class="input-field"
 						required
-						placeholder="Step-by-step solution explanation..."></textarea>
+						placeholder="Пошаговое решние задачи..."></textarea>
 				</div>
 
 				<div>
@@ -156,7 +156,7 @@
 		});
 
 		if (result.success) {
-			router.push(`/tasks/${result.data.id_task}`);
+			router.push(`/`);
 		} else {
 			error.value = result.error || 'Не удалось создать задание';
 		}
