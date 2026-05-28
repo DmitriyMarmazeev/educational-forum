@@ -2,7 +2,7 @@
 	<div class="space-y-8 animate-fade-in pt-6">
 		<div class="text-center space-y-4">
 			<h1
-				class="text-3xl sm:text-5xl font-bold bg-gradient-to-r from-primary-500 to-secondary-500 bg-clip-text text-transparent">
+				class="text-3xl/[1.2] sm:text-5xl/[1.2] font-bold bg-gradient-to-r from-primary-500 to-secondary-500 bg-clip-text text-transparent">
 				Образовательный форум
 			</h1>
 			<p class="text-base sm:text-xl text-gray-600 dark:text-gray-400">
